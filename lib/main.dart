@@ -70,10 +70,9 @@ class _MyAppState extends State<MyApp> {
                   return SignupPage();
                 case Status.Chat:
                   return ChatPage(userId: '', userName: '', chatName: '', conversationId: '', boolnewchat: false, chatnRoom: '', 
-                  // roomName: '',
                   );
                 default:
-                  return LoginPage(); // Show login page by default
+                  return LoginPage();
               }
             },
           ),

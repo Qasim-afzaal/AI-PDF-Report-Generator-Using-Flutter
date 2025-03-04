@@ -1,6 +1,3 @@
-Here’s a polished version with icons, badges, and visual elements to make it GitHub-friendly and eye-catching:
-
-```markdown
 # 🏠 RoofEstimate AI: Intelligent Construction Report Generator  
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.13-%2302569B?logo=flutter)](https://flutter.dev)
@@ -129,7 +126,7 @@ Authorization: Bearer {YOUR_TOKEN}
 
 ---
 
-> **Crafted with ❤️ by [Your Name]**  
+> **Crafted with ❤️ by Qasim Afzaal**  
 > [![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?logo=twitter)](https://twitter.com/yourhandle)
 > [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?logo=linkedin)](https://linkedin.com/in/yourprofile)
 ```

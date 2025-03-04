@@ -80,7 +80,7 @@ Authorization: Bearer {YOUR_TOKEN}
 
 1. **Clone Repo**  
    ```bash
-   git clone https://github.com/yourusername/roof-estimate-ai.git
+   git clone https://github.com/Qasim-afzaal/roof-estimate-ai.git
    ```
 
 2. **Install Dependencies**  

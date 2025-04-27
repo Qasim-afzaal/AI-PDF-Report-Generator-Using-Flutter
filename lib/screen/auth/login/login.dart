@@ -1,6 +1,9 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
+
 import 'package:tradelinkedai/core/components/app_button.dart';
 import 'package:tradelinkedai/core/components/app_text_field.dart';
 import 'package:tradelinkedai/core/components/sb.dart';
@@ -53,6 +56,11 @@ class _LoginPageState extends State<LoginPage> {
   void _googleSignIn() async {
     AuthProvider auth = Provider.of<AuthProvider>(context, listen: false);
     await auth.signInWithGoogle();
+  }
+
+    void _appleSignIn() async {
+    AuthProvider auth = Provider.of<AuthProvider>(context, listen: false);
+    await auth.signInWithApple();
   }
 
   @override
@@ -180,7 +188,9 @@ class _LoginPageState extends State<LoginPage> {
                     if (Platform.isIOS) ...[
                       SB.w(15),
                       AppButton.borderIcon(
-                        onTap: () async {},
+                        onTap: () async {
+                          _appleSignIn();
+                        },
                         icon: Image.asset(
                           "assets/images/logo/apple.png",
                           scale: 10,

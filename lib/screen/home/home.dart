@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
+
 import 'package:tradelinkedai/core/components/app_button.dart';
 import 'package:tradelinkedai/core/providers/auth.dart';
 import 'package:tradelinkedai/core/providers/main_provider.dart';
@@ -51,7 +53,7 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 20),
                   Text(
                     'Create Chat',
-                    style: Theme.of(context).textTheme.headline6?.copyWith(
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
@@ -59,7 +61,7 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 8),
                   Text(
                     "Enter chat name to create chat",
-                    style: Theme.of(context).textTheme.bodyText2?.copyWith(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w500,
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 14,
@@ -91,7 +93,7 @@ class _HomePageState extends State<HomePage> {
                                 context, listen: false);
                             final userId = authProvider.user?.data.id;
                             final username = authProvider.user?.data.name;
-
+                            
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -99,6 +101,7 @@ class _HomePageState extends State<HomePage> {
                                         userId: userId!,
                                         userName: username!,
                                         chatName: _chatNameController.text,
+                                        threadID: '',
                                         conversationId: '',
                                         chatnRoom: _chatNameController.text,
                                         boolnewchat: true,
@@ -115,6 +118,7 @@ class _HomePageState extends State<HomePage> {
                       );
                     },
                   ),
+                  SizedBox(height: 40,),
                 ],
               ),
             ),
@@ -148,7 +152,7 @@ fetchusername(){
 
   @override
   void dispose() {
-    Provider.of<ChatProvider>(context, listen: false).disconnectFromChat();
+    // Provider.of<ChatProvider>(context, listen: false).disconnectFromChat();
     _chatNameController.dispose();
     super.dispose();
   }
@@ -246,6 +250,8 @@ fetchusername(){
                                     chatName: chatname,
                                     conversationId:
                                         chatprovider.currentChatName!,
+                                        threadID:chatProvider
+                                        .allChat!.data[index].threadId!,
                                     boolnewchat: false,
                                     chatnRoom: chatProvider
                                         .allChat!.data[index].conversationName!,

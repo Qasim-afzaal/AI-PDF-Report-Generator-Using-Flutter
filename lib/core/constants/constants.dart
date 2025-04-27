@@ -22,7 +22,7 @@ class Constants {
   static const String error = 'Error';
 
   /// API
-  static const String baseUrl = '';
+  static const String baseUrl = 'http://50.19.124.175';
   static const String port = ':3005/api/';
 
   /// Users API end point

@@ -14,6 +14,7 @@ import 'package:flutter_pdfview/flutter_pdfview.dart'; // For PDF viewing
 class ChatPage extends StatefulWidget {
   final String userId;
   final String conversationId;
+  final String threadID;
   String chatnRoom;
   bool boolnewchat;
   final String userName;
@@ -27,6 +28,7 @@ class ChatPage extends StatefulWidget {
     required this.conversationId,
     required this.boolnewchat,
     required this.chatName,
+    required this.threadID,
   });
 
   @override
@@ -47,11 +49,18 @@ class _ChatPageState extends State<ChatPage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final chatProvider = Provider.of<ChatProvider>(context, listen: false);
+      getThreadId();
       getConversation();
 
       chatProvider.connectToChat();
       print(widget.boolnewchat);
     });
+  }
+
+  getThreadId() async {
+    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    print("i am in thread api");
+    await chatProvider.callPostApi();
   }
 
   void getConversation() {
@@ -64,10 +73,14 @@ class _ChatPageState extends State<ChatPage> {
     Provider.of<ChatProvider>(context, listen: false).storeBody(chatData);
   }
 
-  void _startChat(String content) {
+  void _startChat(String content) async {
+    print("i am in start chat");
+    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
+
     final chatData = {
       'user_id': widget.userId,
       'name': widget.chatName,
+      'thread_id': chatProvider.getThreadID ?? "",
       'text': content,
     };
 
@@ -80,6 +93,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _sendMessage(String content) {
+    print(" i am in sendmsg");
     final message = _messageController.text.trim();
     if (message.isNotEmpty) {
       Provider.of<ChatProvider>(context, listen: false).sendMessage(
@@ -309,16 +323,38 @@ class _ChatPageState extends State<ChatPage> {
                                     TextStyle(fontSize: 16, color: Colors.grey),
                               ),
                             )
-                          : ListView.builder(
-                              reverse: true,
-                              padding: const EdgeInsets.all(8.0),
-                              itemCount: messages.length,
-                              itemBuilder: (context, index) {
-                                final reversedIndex =
-                                    messages.length - 1 - index;
-                                final message = messages[reversedIndex];
-                                return _buildMessageBubble(message);
-                              },
+                          : Stack(
+                              children: [
+                                ListView.builder(
+                                  reverse: true,
+                                  padding: const EdgeInsets.all(8.0),
+                                  itemCount: messages.length,
+                                  itemBuilder: (context, index) {
+                                    final reversedIndex =
+                                        messages.length - 1 - index;
+                                    final message = messages[reversedIndex];
+                                    return _buildMessageBubble(message);
+                                  },
+                                ),
+                                if (chatProvider.isLoading == true)
+                                  Positioned.fill(
+                                    child: Container(
+                                      color: Colors.black.withOpacity(
+                                          0.5), // Semi-transparent overlay
+                                      child: Center(
+                                        child: AlertDialog(
+                                          content: Row(
+                                            children: const [
+                                              CircularProgressIndicator(),
+                                              SizedBox(width: 16),
+                                              Text('Please wait...'),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             );
                     },
                   ),
@@ -352,23 +388,17 @@ class _ChatPageState extends State<ChatPage> {
                           ),
                         ),
                       ),
-                      chatProvider.currentChatMessages
-                              .where((msg) => msg.fileUrl != null &&  msg.fileUrl != "")
-                              .isNotEmpty
-                          ? SizedBox() // Show nothing if no valid file URLs
-                          : IconButton(
-                              icon: const Icon(Icons.send,
-                                  color: Colors.blueAccent),
-                              onPressed: Provider.of<ChatProvider>(context)
-                                      .isChatEnabled
-                                  ? () {
-                                      widget.boolnewchat == true
-                                          ? _startChat(_messageController.text)
-                                          : _sendMessage(
-                                              _messageController.text);
-                                    }
-                                  : null,
-                            ),
+                  chatProvider.isLoading == false ?   IconButton(
+                        icon: const Icon(Icons.send, color: Colors.blueAccent),
+                        onPressed:
+                            Provider.of<ChatProvider>(context).isChatEnabled
+                                ? () {
+                                    widget.boolnewchat == true
+                                        ? _startChat(_messageController.text)
+                                        : _sendMessage(_messageController.text);
+                                  }
+                                : null,
+                      ):SizedBox()
                     ],
                   ),
                 ),

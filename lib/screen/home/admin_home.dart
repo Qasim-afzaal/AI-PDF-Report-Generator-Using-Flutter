@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
+
 import 'package:tradelinkedai/core/providers/auth.dart';
 import 'package:tradelinkedai/widget/appbar.dart';
 
@@ -211,7 +213,7 @@ class FolderRequestCard extends StatelessWidget {
                 chatProvider.getCount,
                 style: Theme.of(context)
                     .textTheme
-                    .subtitle1
+                    .titleMedium
                     ?.copyWith(fontSize: 14), // Smaller font size
               )
             else ...[
@@ -224,7 +226,7 @@ class FolderRequestCard extends StatelessWidget {
                 index == 0 ? 'Documents 2' : 'question files',
                 style: Theme.of(context)
                     .textTheme
-                    .bodyText2
+                    .bodyMedium
                     ?.copyWith(fontSize: 14), // Smaller font size
               ),
               const SizedBox(
@@ -273,7 +275,7 @@ class CustomCard extends StatelessWidget {
             Text(
               'Documents 2',
               style:
-                  Theme.of(context).textTheme.bodyText2?.copyWith(fontSize: 14),
+                  Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 14),
             ),
             const SizedBox(height: 4.0),
             Row(

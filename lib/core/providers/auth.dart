@@ -1,10 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+
 import 'package:tradelinkedai/core/constants/app_globals.dart';
 import 'package:tradelinkedai/core/constants/constants.dart';
 import 'package:tradelinkedai/models/getAllList.dart';
@@ -298,6 +302,8 @@ print("ia ma here");
     }
   }
 
+ 
+
   Future<bool> getAllPdfList() async {
     _profileloading = Status.Loading; // Set to Loading at the start
     notifyListeners();
@@ -414,7 +420,55 @@ print("ia ma here");
       throw 'Unknown exception encountered: $e';
     }
   }
+Future<UserCredential?> signInWithApple() async {
+  try {
+    // Request an authorization credential from Apple
+    final AuthorizationCredentialAppleID appleCredential =
+        await SignInWithApple.getAppleIDCredential(
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+    );
 
+    // Convert Apple credential to OAuth credential
+    final OAuthCredential oauthCredential = OAuthProvider('apple.com').credential(
+      idToken: appleCredential.identityToken,
+      accessToken: appleCredential.authorizationCode,
+    );
+
+    // Sign in with Firebase using the credential
+    UserCredential userCredential =
+        await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+    final user = userCredential.user;
+
+    if (user != null) {
+      String? name =
+          '${appleCredential.givenName ?? ""} ${appleCredential.familyName ?? ""}'.trim();
+      String? email = user.email;
+
+      // Set these values according to your application's logic
+      _name = name.isNotEmpty ? name : null;
+      _email = email;
+      _authProbvider = "APPLE";
+
+      print("Apple Sign-In successful: Name: $_name, Email: $_email");
+
+      // Call the login API
+      bool loginSuccess = await login(email!, "", 'apple');
+      if (!loginSuccess) {
+        print("Login API call failed.");
+        return null;
+      }
+    }
+
+    return userCredential;
+  } on FirebaseAuthException catch (e) {
+    throw 'Signin exception encountered: ${e.message}';
+  } catch (e) {
+    throw 'Unknown exception encountered: $e';
+  }
+}
   static onError(error) {
     print("the error is $error.detail");
     return {'status': false, 'message': 'Unsuccessful Request', 'data': error};

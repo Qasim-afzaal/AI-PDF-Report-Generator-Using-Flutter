@@ -55,6 +55,7 @@ dependencies:
   google_sign_in:
   flutter_phoenix: ^1.1.1
   dio: ^5.0.0  # Use the latest version
+  sign_in_with_apple: ^7.0.1
 
 dev_dependencies:
   flutter_test:

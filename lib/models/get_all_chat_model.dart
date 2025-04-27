@@ -31,12 +31,14 @@ class ConversationResponse {
 class ConversationData {
   final String conversationId;
   final String? conversationName;
+  final String? threadId;
   final String? chatType;
   final String createdAt;
 
   ConversationData({
     required this.conversationId,
     this.conversationName,
+     required this.threadId,
     this.chatType,
     required this.createdAt,
   });
@@ -45,6 +47,7 @@ class ConversationData {
     return ConversationData(
       conversationId: json['conversation_id'],
       conversationName: json['conversation_name'],
+        threadId: json['thread_id'],
       chatType: json['chat_type'],
       createdAt: json['created_at'],
     );
@@ -54,6 +57,7 @@ class ConversationData {
     return {
       'conversation_id': conversationId,
       'conversation_name': conversationName,
+       'thread_id': threadId,
       'chat_type': chatType,
       'created_at': createdAt,
     };

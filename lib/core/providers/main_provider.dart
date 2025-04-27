@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:tradelinkedai/core/constants/app_globals.dart';
 import 'package:tradelinkedai/core/constants/constants.dart';
 import 'package:tradelinkedai/models/msgs_model.dart';
 import 'package:tradelinkedai/services/api_repository.dart';
+import 'package:http/http.dart' as http;
 
 enum LoadingState { loading, loaded, error }
 
@@ -53,6 +56,15 @@ class ChatProvider with ChangeNotifier {
     _loadingState = state;
     notifyListeners();
   }
+
+  bool _isLoading = false;
+
+bool get isLoading => _isLoading;
+
+void setLoading(bool loading) {
+  _isLoading = loading;
+  notifyListeners(); 
+}
 
   // Connect to the current chat
   void connectToChat() {
@@ -109,6 +121,7 @@ class ChatProvider with ChangeNotifier {
 
     // Listener for the "receiveMessage" event
     _socket!.on("receiveMessage", (data) {
+       setLoading(false);
       print(" message from 'message' event: $data");
       _currentChatName = data[0]["conversation_id"];
 
@@ -136,6 +149,7 @@ class ChatProvider with ChangeNotifier {
     // Listener for the "message" event
     _socket!.on("message", (data) {
       print(" message from 'message' event: $data");
+       setLoading(false);
       _currentChatName = data[0]["conversation_id"];
 
       if (data is List) {
@@ -177,6 +191,56 @@ class ChatProvider with ChangeNotifier {
     });
   }
 
+String _getThreadID="";
+  String get getThreadID => _getThreadID;
+
+
+
+Future<void> callPostApi() async {
+  const String url = "http://50.19.124.175:8000/create_thread";
+  Map<String, String> headers = {
+    'Content-Type': 'application/json',
+    'X-API-KEY': '123456789',
+  };
+
+  try {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: headers,
+    );
+
+    print("HTTP Status Code: ${response.statusCode}");
+    print("Response Headers: ${response.headers}");
+    print("This is the API response: ${response.body}");
+
+    if (response.statusCode == 307) {
+      print('Redirecting to: ${response.headers['location']}');
+
+      // Follow the redirection
+      final redirectedUrl = response.headers['location']!;
+      final redirectResponse = await http.post(
+        Uri.parse(redirectedUrl),
+        headers: headers,
+      );
+
+      print("Redirected Response Status Code: ${redirectResponse.statusCode}");
+      print("Redirected Response Body: ${redirectResponse.body}");
+      var res= jsonDecode(redirectResponse.body) ;
+      _getThreadID=res["thread_id"];
+      print("this is thread idddd$_getThreadID");
+      notifyListeners();
+    } else if (response.statusCode == 200 || response.statusCode == 201) {
+      print('Success: ${response.body}');
+    } else {
+      print('Failed with status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+    }
+  } catch (e) {
+    print('Error: $e');
+  }
+}
+
+
   // Disconnect from the current chat
   void disconnectFromChat() {
     if (_socket != null) {
@@ -205,6 +269,7 @@ class ChatProvider with ChangeNotifier {
 
   // Send a text message
   void sendMessage(String userId, String conversationId, String message) {
+ setLoading(true);    
     if (_socket != null) {
       final messageData = {
         'user_id': userId,
@@ -233,6 +298,7 @@ class ChatProvider with ChangeNotifier {
       print("Cannot send message. Socket is null.");
     }
   }
+   
    Future<void> clearChat(String id) async {
     // _profileloading = Status.Loading; // Set to Loading at the start
     // notifyListeners();
@@ -280,6 +346,7 @@ print("ia ma here");
   // Start a new chat
   void startChat(Map<String, dynamic> chat) {
     print("Starting new chat with data: $chat");
+     setLoading(true);
     _socket!.emit("startChat", chat);
     _currentChatName = chat['chatName'];
 
